@@ -8,6 +8,7 @@ export const site = {
   program: "Astro",
   language: "中文",
   theme: "霞鹜飞楷",
+  themeRepository: "https://github.com/Ficorcc/Weiyang",
   socialLinks: [
     { name: "GitHub", href: "https://github.com/", icon: "github" },
     { name: "Mastodon", href: "https://mastodon.social/", icon: "mastodon" },

@@ -268,6 +268,12 @@ const footerSocialLinks = site.socialLinks.map((item) => ({
           <svg class="footer-tech-icon" aria-hidden="true" viewBox={simpleIcons.astro.viewBox}>
             {simpleIcons.astro.paths.map((path) => <path d={path} />)}
           </svg>
+          <span class="footer-separator">·</span>
+          <a class="footer-repo-link" href={site.themeRepository} aria-label="主题仓库" title="主题仓库">
+            <svg aria-hidden="true" viewBox={fontAwesomeIcons.github.viewBox}>
+              {fontAwesomeIcons.github.paths.map((path) => <path d={path} />)}
+            </svg>
+          </a>
         </div>
       </footer>
     </div>
