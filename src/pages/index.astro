@@ -1,0 +1,112 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { latestComments, moments, posts, profile, site } from "@/data/site";
+import { categoryUrl, tagUrl } from "@/utils/taxonomy";
+
+const latestMoment = moments[0];
+const updateEntries = [
+  ...moments.map((moment) => ({ date: moment.date, title: moment.title, type: "动态" })),
+  ...posts.map((post) => ({ date: post.date, title: post.title, type: post.category })),
+];
+const updatesByDate = updateEntries.reduce<Record<string, { count: number; items: typeof updateEntries }>>((acc, item) => {
+  acc[item.date] ??= { count: 0, items: [] };
+  acc[item.date].count += 1;
+  acc[item.date].items.push(item);
+  return acc;
+}, {});
+const commentsByDate = latestComments.reduce<Record<string, typeof latestComments>>((acc, comment) => {
+  acc[comment.date] ??= [];
+  acc[comment.date].push(comment);
+  return acc;
+}, {});
+const timelineDates = [...new Set([...Object.keys(updatesByDate), ...Object.keys(commentsByDate)])];
+const timelineItems = timelineDates
+  .map((date) => {
+    const updates = updatesByDate[date]?.items ?? [];
+    const comments = commentsByDate[date] ?? [];
+    return { date, count: updates.length + comments.length, items: updates, comments };
+  })
+  .sort((a, b) => a.date.localeCompare(b.date));
+const maxUpdateCount = Math.max(...timelineItems.map((item) => item.count));
+---
+
+<BaseLayout title="首页" description="个人介绍、最新动态与最新文章。">
+  <section class="hero-panel">
+    <div class="profile-card">
+      <div class="profile-copy">
+        <p class="profile-title">{site.title}</p>
+        <h1>{profile.subtitle}</h1>
+      </div>
+      <img class="hero-logo" src={site.logo} alt="" />
+    </div>
+  </section>
+
+  <div class="intro-divider" aria-hidden="true"></div>
+
+  <section class="content-stack" aria-label="首页内容">
+    <p class="section-kicker">MOMENT</p>
+    <div class="moment-list home-moment-section">
+      <article class="moment-item">
+        <div>
+          <h3>{latestMoment.title}</h3>
+          <p>{latestMoment.text}</p>
+        </div>
+        <time datetime={latestMoment.date}>{latestMoment.date}</time>
+      </article>
+    </div>
+
+    <p class="section-kicker note-kicker">NOTE</p>
+    <div class="article-list home-article-section">
+      {
+        posts.map((post) => (
+          <article class="moment-item article-row">
+            <div class="article-title-line">
+              <h3><a href={post.href}>{post.title}</a></h3>
+              <a class="article-category" href={categoryUrl(post.category)}>{post.category}</a>
+            </div>
+            <div class="article-side-meta">
+              <div class="article-taxonomy">
+                {post.tags.map((tag) => <a href={tagUrl(tag)}>#{tag}</a>)}
+              </div>
+              <time datetime={post.date}>{post.date}</time>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="timeline-divider" aria-hidden="true"></div>
+
+    <div class="update-timeline" aria-label="更新频率时间轴">
+      {
+        timelineItems.map((item, index) => (
+          <time
+            class:list={["timeline-node", index % 2 === 0 ? "is-above" : "is-below"]}
+            datetime={item.date}
+            title={`${item.date} 更新 ${item.count} 次`}
+            style={`--node-height: ${11 + (item.count / maxUpdateCount) * 23}px`}
+            aria-label={`${item.date} 更新 ${item.count} 次`}
+            tabindex="0"
+          >
+            <span class="timeline-line"></span>
+            <span class="timeline-popover" aria-hidden="true">
+              <strong>{item.date}</strong>
+              {item.items.map((update) => (
+                <span class="timeline-update">
+                  <em>{update.type}</em>
+                  <span>{update.title}</span>
+                </span>
+              ))}
+              {item.comments.map((comment) => (
+                <span class="timeline-update timeline-comment">
+                  <span>{comment.articleTitle}</span>
+                  <em>{comment.commenter}</em>
+                </span>
+              ))}
+            </span>
+          </time>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

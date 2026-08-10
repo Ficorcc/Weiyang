@@ -1,0 +1,24 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { moments } from "@/data/site";
+---
+
+<BaseLayout title="动态">
+  <section class="simple-page">
+    <p class="eyebrow">Moments</p>
+    <h1>动态</h1>
+    <div class="moment-list page-list">
+      {
+        moments.map((moment) => (
+          <article class="moment-item">
+            <div>
+              <h2>{moment.title}</h2>
+              <p>{moment.text}</p>
+            </div>
+            <time datetime={moment.date}>{moment.date}</time>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

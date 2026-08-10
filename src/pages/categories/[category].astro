@@ -1,0 +1,43 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { posts } from "@/data/site";
+import { taxonomySlug, tagUrl } from "@/utils/taxonomy";
+
+export function getStaticPaths() {
+  const categories = [...new Set(posts.map((post) => post.category))];
+
+  return categories.map((category) => ({
+    params: { category: taxonomySlug(category) },
+    props: {
+      category,
+      categoryPosts: posts.filter((post) => post.category === category),
+    },
+  }));
+}
+
+const { category, categoryPosts } = Astro.props;
+---
+
+<BaseLayout title={`分类：${category}`}>
+  <section class="simple-page">
+    <p class="eyebrow">Category</p>
+    <h1>{category}</h1>
+    <div class="article-list page-list">
+      {
+        categoryPosts.map((post) => (
+          <article class="moment-item article-row">
+            <div class="article-title-line">
+              <h3><a href={post.href}>{post.title}</a></h3>
+            </div>
+            <div class="article-side-meta">
+              <div class="article-taxonomy">
+                {post.tags.map((tag) => <a href={tagUrl(tag)}>#{tag}</a>)}
+              </div>
+              <time datetime={post.date}>{post.date}</time>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

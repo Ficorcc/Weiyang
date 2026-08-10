@@ -1,0 +1,39 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { posts } from "@/data/site";
+import { categoryUrl, taxonomySlug } from "@/utils/taxonomy";
+
+export function getStaticPaths() {
+  const tags = [...new Set(posts.flatMap((post) => post.tags))];
+
+  return tags.map((tag) => ({
+    params: { tag: taxonomySlug(tag) },
+    props: {
+      tag,
+      tagPosts: posts.filter((post) => post.tags.includes(tag)),
+    },
+  }));
+}
+
+const { tag, tagPosts } = Astro.props;
+---
+
+<BaseLayout title={`标签：${tag}`}>
+  <section class="simple-page">
+    <p class="eyebrow">Tag</p>
+    <h1>#{tag}</h1>
+    <div class="article-list page-list">
+      {
+        tagPosts.map((post) => (
+          <article class="moment-item article-row">
+            <div class="article-title-line">
+              <h3><a href={post.href}>{post.title}</a></h3>
+              <a class="article-category" href={categoryUrl(post.category)}>{post.category}</a>
+            </div>
+            <time datetime={post.date}>{post.date}</time>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

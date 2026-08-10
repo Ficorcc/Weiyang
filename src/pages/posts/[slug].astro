@@ -1,0 +1,118 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { posts } from "@/data/site";
+import { categoryUrl, tagUrl } from "@/utils/taxonomy";
+
+export function getStaticPaths() {
+  return posts.map((post) => {
+    const slug = post.href.split("/").filter(Boolean).at(-1);
+
+    return {
+      params: { slug },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const tocItems = [
+  { title: "起笔", href: "#start", level: 2 },
+  { title: "结构", href: "#structure", level: 2 },
+  { title: "细节", href: "#detail", level: 3 },
+  { title: "收束", href: "#closing", level: 2 },
+];
+---
+
+<BaseLayout title={post.title} description={post.excerpt}>
+  <article id="post-top" class="simple-page post-page">
+    <a class="eyebrow taxonomy-link" href={categoryUrl(post.category)}>{post.category}</a>
+    <h1>{post.title}</h1>
+    <div class="article-meta post-meta">
+      <time datetime={post.date}>{post.date}</time>
+      <a class="taxonomy-link" href={categoryUrl(post.category)}>{post.category}</a>
+      {post.tags.map((tag) => <a class="taxonomy-link" href={tagUrl(tag)}>#{tag}</a>)}
+    </div>
+
+    <div class="post-reading-layout">
+      <div class="post-reading">
+        <div class="post-body">
+          <section id="start">
+            <h2>起笔</h2>
+            <p>{post.excerpt}</p>
+          </section>
+          <section id="structure">
+            <h2>结构</h2>
+            <p>这里是文章正文区域。后续可以接入 Markdown 内容集合，让每一篇文章从独立文件生成。</p>
+            <h3 id="detail">细节</h3>
+            <p>当前主题已经预留了标题、日期、分类、摘要和正文的排版节奏，适合作为正式内容接入前的样式基准。</p>
+          </section>
+          <section id="closing">
+            <h2>收束</h2>
+            <p>评论区和目录树保持轻量线性结构，方便后续接入真实评论系统与自动生成目录。</p>
+          </section>
+        </div>
+
+        <section id="comments" class="comment-section" aria-label="评论区">
+          <div class="comment-head">
+            <p class="eyebrow">Comments</p>
+            <span>2 条</span>
+          </div>
+          <form class="comment-form">
+            <div class="comment-form-grid">
+              <input type="text" name="name" placeholder="昵称" aria-label="昵称" />
+              <input type="email" name="email" placeholder="邮箱" aria-label="邮箱" />
+              <input type="url" name="url" placeholder="网址（选填）" aria-label="网址（选填）" />
+            </div>
+            <textarea name="comment" rows="4" placeholder="写点什么" aria-label="评论内容"></textarea>
+            <button type="button">发送评论</button>
+          </form>
+          <ol class="comment-list">
+            <li class="comment-item">
+              <div class="comment-meta">
+                <strong>Ficor</strong>
+                <time datetime="2026-08-10">2026-08-10</time>
+              </div>
+              <p>评论区样式先搭好，后续可以接入 Waline、Twikoo 或自建接口。</p>
+              <ol class="comment-children">
+                <li class="comment-item">
+                  <div class="comment-meta">
+                    <strong>未央</strong>
+                    <time datetime="2026-08-10">2026-08-10</time>
+                  </div>
+                  <p>嵌套回复会沿着竖线展开，层级保持清楚。</p>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </section>
+      </div>
+
+      <aside class="post-side" aria-label="文章辅助导航">
+        <div class="post-toc">
+          <p class="post-toc-title">Contents</p>
+          <ol class="toc-tree">
+            {
+              tocItems.map((item) => (
+                <li class:list={[item.level === 3 && "is-child"]}>
+                  <a href={item.href}>{item.title}</a>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <div class="post-side-actions" aria-label="文章快捷操作">
+          <a class="post-side-action" href="#post-top" aria-label="回到顶部" title="回到顶部">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M12 4 5.5 10.5l1.42 1.42L11 7.84V20h2V7.84l4.08 4.08 1.42-1.42L12 4Z"></path>
+            </svg>
+          </a>
+          <a class="post-side-action" href="#comments" aria-label="去评论区" title="去评论区">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M4 4h16v12H8.3L4 20.3V4Zm2 2v9.48L7.48 14H18V6H6Zm3 3h6v1.7H9V9Zm0 3h4v1.7H9V12Z"></path>
+            </svg>
+          </a>
+        </div>
+      </aside>
+    </div>
+  </article>
+</BaseLayout>

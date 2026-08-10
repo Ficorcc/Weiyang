@@ -1,0 +1,40 @@
+---
+import { friendLinks } from "@/data/friends";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="友链">
+  <section class="simple-page friends-page">
+    <p class="eyebrow">Friends</p>
+    <h1>友链</h1>
+    <div class="friend-list">
+      {
+        friendLinks.map((friend) => (
+          <article class="friend-item">
+            <header class="friend-head">
+              <div>
+                <h2><a href={friend.url}>{friend.name}</a></h2>
+                <p>{friend.description}</p>
+              </div>
+              <a class="friend-url" href={friend.url}>{new URL(friend.url).host}</a>
+            </header>
+            <div class="friend-feed">
+              <div class="friend-feed-meta">
+                <span>订阅</span>
+                <a href={friend.feedUrl}>{friend.feedUrl.replace(/^https?:\/\//, "")}</a>
+              </div>
+              <ol class="friend-updates">
+                {friend.latestPosts.map((post) => (
+                  <li>
+                    <a href={post.url}>{post.title}</a>
+                    <time datetime={post.date}>{post.date}</time>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

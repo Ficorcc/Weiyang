@@ -1,0 +1,16 @@
+{
+  "name": "weiyang-astro-theme",
+  "version": "0.1.0",
+  "description": "A quiet personal Astro theme for posts, moments, archives, taxonomy, friends and comments.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^7.1.6"
+  },
+  "devDependencies": {}
+}

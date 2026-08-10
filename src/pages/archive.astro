@@ -1,0 +1,77 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { posts } from "@/data/site";
+import { categoryUrl, tagUrl } from "@/utils/taxonomy";
+
+const archiveItems = posts
+  .map((post) => ({
+    date: post.date,
+    title: post.title,
+    href: post.href,
+  }))
+  .sort((a, b) => b.date.localeCompare(a.date));
+
+const archiveGroups = archiveItems.reduce<Array<{ key: string; label: string; items: typeof archiveItems }>>((groups, item) => {
+  const key = item.date.slice(0, 7);
+  const existingGroup = groups.find((group) => group.key === key);
+
+  if (existingGroup) {
+    existingGroup.items.push(item);
+    return groups;
+  }
+
+  const [year, month] = key.split("-");
+  groups.push({
+    key,
+    label: `${year}年${month}月`,
+    items: [item],
+  });
+
+  return groups;
+}, []);
+
+const categories = [...new Set(posts.map((post) => post.category))];
+const tags = [...new Set(posts.flatMap((post) => post.tags))];
+---
+
+<BaseLayout title="归档">
+  <section class="simple-page">
+    <p class="eyebrow">Archive</p>
+    <h1>归档</h1>
+    <div class="archive-list">
+      {
+        archiveGroups.map((group) => (
+          <details class="archive-group" open>
+            <summary>
+              <span>{group.label}</span>
+              <small>{group.items.length} 条</small>
+            </summary>
+            <div class="archive-group-list">
+              {group.items.map((item) => (
+                <div class="archive-item">
+                  {item.href ? <a href={item.href}>{item.title}</a> : <span>{item.title}</span>}
+                  <time datetime={item.date}>{item.date}</time>
+                </div>
+              ))}
+            </div>
+          </details>
+        ))
+      }
+    </div>
+
+    <div class="archive-taxonomy">
+      <div class="archive-taxonomy-row">
+        <span>分类</span>
+        <div class="archive-taxonomy-list">
+          {categories.map((category) => <a href={categoryUrl(category)}>{category}</a>)}
+        </div>
+      </div>
+      <div class="archive-taxonomy-row">
+        <span>标签</span>
+        <div class="archive-taxonomy-list">
+          {tags.map((tag) => <a href={tagUrl(tag)}>#{tag}</a>)}
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
